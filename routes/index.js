@@ -4,6 +4,9 @@ var router = express.Router();
 
 module.exports = function() {
   router.get('/', function(req, res) {
-    res.send('index');
+    res.render('index');
+    // res.send('hello world')
   })
+
+  return router;
 }
