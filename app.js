@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // for HTML form submits
 app.use(bodyParser.json()); // would be for AJAX requests
 app.use(express.static(path.join(__dirname, '/public')));
 
-app.use('/', router());
+app.use('/', router);
 
 models.db.sync({ force: true })
 .then(function () {
@@ -29,3 +29,7 @@ models.db.sync({ force: true })
     });
 })
 .catch(console.error);
+
+app.use(function(err, req, res, next){
+  console.error(err);
+});
