@@ -8,7 +8,6 @@ var User = models.User;
 
   wikiRouter.get('/', function(req, res, next) {
     //res.render('index/');
-    console.log('hello');
     //res.send('wiki root');
     res.redirect('/');
   });
@@ -25,6 +24,7 @@ var User = models.User;
 
       var page = Page.build({
         title: req.body.title,
+        tags: req.body.tags.split(' '),
         content: req.body.content
       });
 
@@ -42,20 +42,50 @@ var User = models.User;
     res.render('addpage');
   });
 
+  wikiRouter.get('/search', function(req, res, next){
+    var tags = req.query.tag;
+    Page.findByTag(tags).then(function(pages){
+      res.render('index', {pages: pages});
+    });
+  });
+
   wikiRouter.get('/:pageurl', function(req,res,next){
     Page.findOne({
       where: {
         urlTitle: req.params.pageurl
-      }
+      },
+      include:[
+        {model: User, as: 'author'}
+      ]
     })
-    // .then(function(page) {
-    //   return page.getAuthor();
-    // })
     .then(function(page){
-      res.render('wikipage', {page});
+      if (page === null) {
+        res.status(404).send();
+      } else {
+        console.log(page.author.name);
+        var tagsString = page.tags.join(' ');
+        res.render('wikipage', {page: page, tagsString: tagsString});
+      }
     })
     .catch(next);
 
   });
+
+  wikiRouter.get('/:pageUrl/similar', function(req, res, next){
+    var url = req.params.pageUrl;
+    Page.findOne({
+      where:{
+        urlTitle: url
+      }
+    }).then(function(pageFound){
+      var tags = pageFound.tags;
+      pageFound.findSimilar(tags).then(function(pages){
+        res.render('index', {pages});
+      });
+    })
+    .catch(next);
+  });
+
+
 
 module.exports = wikiRouter;

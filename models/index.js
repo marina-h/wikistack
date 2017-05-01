@@ -22,6 +22,9 @@ var Page = db.define('page', {
   date: {
       type: Sequelize.DATE,
       defaultValue: Sequelize.NOW
+  },
+  tags: {
+      type: Sequelize.ARRAY(Sequelize.STRING)
   }
 },
 {
@@ -37,6 +40,31 @@ var Page = db.define('page', {
       } else {
         Page.urlTitle = Math.random().toString(36).substring(2, 7);
       }
+    }
+  },
+  classMethods:{
+    findByTag: function(tags){
+      return Page.findAll({
+                where:{
+                  tags: {
+                    $overlap: tags.split(' ')
+                  }
+                }
+              });
+    }
+  },
+  instanceMethods: {
+    findSimilar: function(tags){
+      return Page.findAll({
+        where:{
+          tags: {
+            $overlap: tags
+          },
+          title:{
+            $ne: this.title
+          }
+        }
+      });
     }
   }
 });
