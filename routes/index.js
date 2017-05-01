@@ -8,7 +8,6 @@ module.exports = function() {
   router.get('/', function(req, res) {
     res.render('index');
     // res.send('hello world')
-
   })
   router.use('/wiki', wikiRouter);
   // or, in one line: router.use('/wiki', require('./wiki'));

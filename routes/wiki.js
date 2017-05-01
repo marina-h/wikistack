@@ -1,17 +1,24 @@
 'use strict';
 var express = require('express');
-var router = express.Router();
+var wikiRouter = express.Router();
 
 module.exports = function() {
-  router.get('/', function(req, res) {
+  wikiRouter.get('/', function(req, res, next) {
     //res.render('index/');
-    res.send('hello world')
+    res.send('wiki root')
+  })
 
+  wikiRouter.post('/', function(req, res, next){
+    // submits new page
+    res.send("wiki post");
+  })
 
+  wikiRouter.get('/add', function(req, res, next){
+    res.send('wiki add');
   })
 
 
 
 
-  return router;
+  return wikiRouter;
 }
