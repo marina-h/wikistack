@@ -14,25 +14,28 @@ var User = models.User;
   });
 
   wikiRouter.post('/', function(req, res, next){
-    // submits new page
-    // res.json(req.body);
-    // var urlTitle = function(title){
-    //   if(title){
-    //      return title.replace(/\s+/g, '_').replace(/\W/g, '');
-    //   }else{
-    //     return Math.random().toString(36).substring(2, 7);
-    //   }
-    // }
-    var page = Page.build({
-      title: req.body.title,
-      content: req.body.content
-    });
+    User.findOrCreate({
+      where: {
+        name: req.body.name,
+        email: req.body.email
+      }
+    })
+    .then(function(values) {
+      var user = values[0];
 
-    page.save().then(function(page){
-      res.redirect(page.route);
-      // res.json(pages);
-    });
+      var page = Page.build({
+        title: req.body.title,
+        content: req.body.content
+      });
 
+      return page.save().then(function(savedPage) {
+        return savedPage.setAuthor(user);
+      });
+    })
+    .then(function(savedPage){
+      res.redirect(savedPage.route);
+    })
+    .catch(next);
   });
 
   wikiRouter.get('/add', function(req, res, next){
@@ -40,25 +43,19 @@ var User = models.User;
   });
 
   wikiRouter.get('/:pageurl', function(req,res,next){
-    // var pageUrl = ;
-    // res.send(page + ' cool page');
-  Page.findOne({
+    Page.findOne({
       where: {
         urlTitle: req.params.pageurl
       }
     })
+    // .then(function(page) {
+    //   return page.getAuthor();
+    // })
     .then(function(page){
-      // console.log(page.title);
       res.render('wikipage', {page});
     })
     .catch(next);
 
-
-
   });
-
-
-
-
 
 module.exports = wikiRouter;

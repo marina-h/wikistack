@@ -32,24 +32,14 @@ var Page = db.define('page', {
   },
   hooks: {
     beforeValidate: function(Page){
-      if(Page.title){
+      if (Page.title){
          Page.urlTitle = Page.title.replace(/\s+/g, '_').replace(/\W/g, '');
-      }else{
+      } else {
         Page.urlTitle = Math.random().toString(36).substring(2, 7);
       }
     }
   }
 });
-
-/*
-var urlTitle = function(title){
-  if(title){
-     return title.replace(/\s+/g, '_').replace(/\W/g, '');
-  }else{
-    return Math.random().toString(36).substring(2, 7);
-  }
-}
-*/
 
 var User = db.define('user', {
     name: {
@@ -65,6 +55,7 @@ var User = db.define('user', {
     }
 });
 
+Page.belongsTo(User, { as: 'author' });
 
 module.exports = {
   Page: Page,
